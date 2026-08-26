@@ -93,6 +93,44 @@ describe("Header utils", () => {
             ]);
         });
 
+        it("adds chunked encoding to bodied requests with no framing headers", () => {
+            expect(
+                h2HeadersToH1([
+                    [':authority', 'example.com'],
+                    ['content-type', 'text/plain']
+                ], 'POST')
+            ).to.deep.equal([
+                ['Host', 'example.com'],
+                ['content-type', 'text/plain'],
+                ['Transfer-Encoding', 'chunked']
+            ]);
+        });
+
+        it("does not add chunked encoding when it's already set", () => {
+            expect(
+                h2HeadersToH1([
+                    [':authority', 'example.com'],
+                    ['transfer-encoding', 'gzip, chunked']
+                ], 'POST')
+            ).to.deep.equal([
+                ['Host', 'example.com'],
+                ['transfer-encoding', 'gzip, chunked']
+            ]);
+        });
+
+        it("adds chunked encoding when other encodings are set without it", () => {
+            expect(
+                h2HeadersToH1([
+                    [':authority', 'example.com'],
+                    ['transfer-encoding', 'gzip']
+                ], 'POST')
+            ).to.deep.equal([
+                ['Host', 'example.com'],
+                ['transfer-encoding', 'gzip'],
+                ['Transfer-Encoding', 'chunked']
+            ]);
+        });
+
     });
 
 });

@@ -244,7 +244,9 @@ export function h2HeadersToH1(h2Headers: RawHeaders, method: string): RawHeaders
         method !== 'HEAD' &&
         !( // And you haven't set any kind of framing headers:
             findRawHeader(h1Headers, 'content-length') ||
-            findRawHeader(h1Headers, 'transfer-encoding')?.includes('chunked'))
+            // T-E: chunked is almost completely unreachable here, but we check anyway to guard
+            // against weird data from passthrough callbacks or similar:
+            getHeaderValue(h1Headers, 'transfer-encoding')?.toLowerCase().includes('chunked'))
     ) { // Add transfer-encoding chunked, which should support all possible cases:
         h1Headers.push(['Transfer-Encoding', 'chunked']);
     }
