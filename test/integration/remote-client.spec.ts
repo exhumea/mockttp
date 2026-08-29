@@ -201,6 +201,34 @@ nodeOnly(() => {
                     );
                 });
 
+                it("should replace request & response bodies with empty strings", async () => {
+                    await targetServer.forPost('/empty-request').thenCallback(async (req) => ({
+                        status: 200,
+                        body: await req.body.getText() === '' ? 'empty' : 'not-empty'
+                    }));
+
+                    await remoteServer.forPost(targetServer.urlFor('/empty-request')).thenPassThrough({
+                        transformRequest: { replaceBody: '' }
+                    });
+
+                    expect(await request.post(targetServer.urlFor('/empty-request'), {
+                        proxy: remoteServer.urlFor('/'),
+                        body: 'original-body'
+                    })).to.equal('empty');
+
+                    await targetServer.forPost('/empty-response').thenReply(200, 'original-body');
+                    await remoteServer.forPost(targetServer.urlFor('/empty-response')).thenPassThrough({
+                        transformResponse: { replaceBody: '' }
+                    });
+
+                    const response = await request.post(targetServer.urlFor('/empty-response'), {
+                        proxy: remoteServer.urlFor('/'),
+                        resolveWithFullResponse: true
+                    });
+
+                    expect(response.body).to.equal('');
+                });
+
                 it("should successfully update request & response body JSON", async () => {
                     // Echo the incoming request
                     await targetServer.forAnyRequest().thenCallback(async (req) => ({

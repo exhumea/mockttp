@@ -886,6 +886,28 @@ nodeOnly(() => {
                     expect(response.body).to.equal('replacement-body');
                 });
 
+                it("can replace the body with an empty string", async () => {
+                    await server.forAnyRequest().thenPassThrough({
+                        transformResponse: {
+                            replaceBody: ''
+                        }
+                    });
+
+                    let response = await request.post(remoteServerHttpUrl, {
+                        resolveWithFullResponse: true,
+                        simple: false
+                    });
+
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.headers).to.deep.equal({
+                        'content-type': 'application/json',
+                        'content-length': '0',
+                        'connection': 'keep-alive',
+                        'custom-response-header': 'custom-value',
+                    });
+                    expect(response.body).to.equal('');
+                });
+
                 it("can replace the body with a buffer", async () => {
                     await server.forAnyRequest().thenPassThrough({
                         transformResponse: {

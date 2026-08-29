@@ -547,7 +547,7 @@ export class PassThroughStepImpl extends PassThroughStep {
                 rawHeaders = objectHeadersToRaw(replaceHeaders);
             }
 
-            if (replaceBody) {
+            if (replaceBody !== undefined) {
                 // Note that we're replacing the body without actually waiting for the real one, so
                 // this can result in sending a request much more quickly!
                 reqBodyOverride = asBuffer(replaceBody);
@@ -888,7 +888,7 @@ export class PassThroughStepImpl extends PassThroughStep {
                         serverRawHeaders = objectHeadersToRaw(replaceHeaders);
                     }
 
-                    if (replaceBody) {
+                    if (replaceBody !== undefined) {
                         // Note that we're replacing the body without actually waiting for the real one, so
                         // this can result in sending a request much more quickly!
                         resBodyOverride = asBuffer(replaceBody);
