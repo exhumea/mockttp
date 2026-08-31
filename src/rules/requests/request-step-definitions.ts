@@ -942,7 +942,7 @@ export class PassThroughStep extends Serializable implements RequestStepDefiniti
             transformRequest: this.transformRequest ? {
                 ...this.transformRequest,
                 // Body is always serialized as a base64 buffer:
-                replaceBody: !!this.transformRequest?.replaceBody
+                replaceBody: this.transformRequest?.replaceBody !== undefined
                     ? serializeBuffer(asBuffer(this.transformRequest.replaceBody))
                     : undefined,
                 // Update objects need to capture undefined & null as distict values:
@@ -977,7 +977,7 @@ export class PassThroughStep extends Serializable implements RequestStepDefiniti
             transformResponse: this.transformResponse ? {
                 ...this.transformResponse,
                 // Body is always serialized as a base64 buffer:
-                replaceBody: !!this.transformResponse?.replaceBody
+                replaceBody: this.transformResponse?.replaceBody !== undefined
                     ? serializeBuffer(asBuffer(this.transformResponse.replaceBody))
                     : undefined,
                 // Update objects need to capture undefined & null as distict values:

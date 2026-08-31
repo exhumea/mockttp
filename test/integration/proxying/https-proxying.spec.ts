@@ -561,6 +561,25 @@ nodeOnly(() => {
                 expect(response.body.toString('utf8')).to.equal("Real HTTP/2 response");
             });
 
+            it("can replace an HTTP/2 request body with an empty string", async () => {
+                await server.forAnyRequest().thenPassThrough({
+                    ignoreHostHttpsErrors: ['localhost'],
+                    transformRequest: { replaceBody: '' }
+                });
+
+                const response = await http2ProxyRequest(
+                    server,
+                    `https://localhost:${targetPort}`,
+                    {
+                        headers: { ':method': 'POST' },
+                        requestBody: 'initial-body'
+                    }
+                );
+
+                expect(response.headers[':status']).to.equal(200);
+                expect(response.headers['received-body']).to.equal('');
+            });
+
             it("can pass through response trailers successfully", async () => {
                 await server.forAnyRequest().thenPassThrough({
                     ignoreHostHttpsErrors: ['localhost']
